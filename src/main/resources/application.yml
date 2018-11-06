@@ -12,4 +12,4 @@ spring:
     host: 39.108.48.29
     port: 6379
     password: hiram
-    timeout: 0
+    timeout: 200

@@ -1,9 +1,7 @@
 package com.hiramexpress.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.hiramexpress.domain.Result;
 import com.hiramexpress.service.CheckExpress;
-import com.hiramexpress.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +20,6 @@ public class ExpressController {
 
     @PostMapping("/check")
     public Result<?> CheckExpressWithCode(String shipperCode, String logisticCode) throws Exception {
-        return ResultUtil.success(checkExpress.checkExpress(shipperCode, logisticCode));
+        return checkExpress.checkExpress(shipperCode, logisticCode);
     }
 }
