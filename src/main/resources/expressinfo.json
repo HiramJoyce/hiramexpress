@@ -1,0 +1,26 @@
+{
+  "name": "快递名称对应数据",
+  "version": "1.0.0",
+  "data": {
+    "KDNIAO": {
+      "YD": "YD",
+      "SF": "SF",
+      "ZTO": "ZTO",
+      "STO": "STO",
+      "YTO": "YTO",
+      "EMS": "EMS",
+      "HHTT": "HHTT",
+      "JD": "JD"
+    },
+    "KDPT": {
+      "YD": "yunda",
+      "SF": "shunfeng",
+      "ZTO": "zhongtong",
+      "STO": "shentong",
+      "YTO": "yuantong",
+      "EMS": "ems",
+      "HHTT": "tiantian",
+      "JD": "jingdong"
+    }
+  }
+}
