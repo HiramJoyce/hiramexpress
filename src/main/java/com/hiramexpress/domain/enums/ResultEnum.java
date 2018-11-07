@@ -12,6 +12,7 @@ public enum  ResultEnum {
     LOGIN_EXPIRY(-1, "登录失效，请重新登陆"),
     PERMISSION_DENIED(-1, "没有权限"),
     NO_DATA(-1, "暂无数据"),
+    NO_EXPRESS(-1, "暂未收录该快递公司信息"),
     ;
 
     private Integer code;

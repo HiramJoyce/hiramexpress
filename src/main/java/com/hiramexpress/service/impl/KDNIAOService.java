@@ -2,14 +2,13 @@ package com.hiramexpress.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.Feature;
-import com.fasterxml.jackson.core.JsonParser;
 import com.hiramexpress.domain.enums.PlatformEnum;
 import com.hiramexpress.service.IExpressService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Collections;
 
 @Service
 public class KDNIAOService implements IExpressService {
@@ -35,6 +34,7 @@ public class KDNIAOService implements IExpressService {
         JSONObject checkResult = JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
         boolean checkSussess = checkResult.getBoolean("Success");
         JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
+        Collections.reverse(checkTraces);   // KDNIAO默认顺序反转
         if (!checkSussess || checkTraces.size() <= 0) {    // 查询失败 或 没有信息
             logger.info("--->>> check failure for " + checkResult.getString("Reason"));
 //            if (checkResult.getString("Reason") != null && checkResult.getString("Reason").contains("没有可用套餐")) {

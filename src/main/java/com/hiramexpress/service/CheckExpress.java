@@ -52,11 +52,13 @@ public class CheckExpress {
             finalShipperCode = convertExpress.convert(shipperCode, platform);
             if (StringUtils.isEmpty(finalShipperCode)) {
                 checkResult.put("success", false);
-                checkResult.put("reason", "未收录该快递公司信息");
+                checkResult.put("reason", ResultEnum.NO_EXPRESS);
                 continue;
             }
             checkResult = servicesMap.get(platform).checkExpress(finalShipperCode, logisticCode);
-            if (checkResult.getBoolean("success") != null && checkResult.getBoolean("success")) {
+            if (checkResult == null) {
+                continue;
+            } else if (checkResult.getBoolean("success") != null && checkResult.getBoolean("success")) {
                 break;
             } else {
                 logger.info("--->>> " + platform + "  got a false with " + checkResult.getString("reason") + ". Try other platform...");
@@ -68,6 +70,9 @@ public class CheckExpress {
         if (checkResult == null) {
             logger.info("--->>> No data.");
             return ResultUtil.error(ResultEnum.NO_DATA);
+        }
+        if (!checkResult.getBoolean("success")) {
+            return ResultUtil.error(ResultEnum.valueOf(checkResult.getString("reason")));
         }
         return ResultUtil.success(checkResult);
     }
