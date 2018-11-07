@@ -34,16 +34,19 @@ public class KDNIAOService implements IExpressService {
         JSONObject result = new JSONObject();
         JSONObject checkResult = JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
         boolean checkSussess = checkResult.getBoolean("Success");
-        if (!checkSussess) {    // 查询失败
+        JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
+        if (!checkSussess || checkTraces.size() <= 0) {    // 查询失败 或 没有信息
+            logger.info("--->>> check failure for " + checkResult.getString("Reason"));
 //            if (checkResult.getString("Reason") != null && checkResult.getString("Reason").contains("没有可用套餐")) {
 //                // TODO 当日查询次数到达3000
 //            } else {
 //                // TODO 没有物流轨迹的
 //            }
             result.put("success", false);
+            result.put("reason", checkResult.getString("Reason"));
             return result;
         } else {    // 查询成功
-            JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
+            logger.info("--->>> check success.");
             JSONArray newCheckTraces = new JSONArray(); // 获得物流信息
             JSONObject eachStation;
             JSONObject newEachStation;

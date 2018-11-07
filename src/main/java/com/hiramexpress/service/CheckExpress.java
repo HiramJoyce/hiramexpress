@@ -36,7 +36,6 @@ public class CheckExpress {
 
     public Result checkExpress(String shipperCode, String logisticCode) throws Exception {
         logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode);
-        JSONObject result = null;
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
@@ -47,22 +46,29 @@ public class CheckExpress {
 
         String finalShipperCode;
         Iterator<String> keysIterator = servicesMap.keySet().iterator();
+        JSONObject checkResult = new JSONObject();
         while (keysIterator.hasNext()) {
             String platform = keysIterator.next();
             finalShipperCode = convertExpress.convert(shipperCode, platform);
-            result = servicesMap.get(platform).checkExpress(finalShipperCode, logisticCode);
-            if (result.getBoolean("success") != null && result.getBoolean("success")) {
+            if (StringUtils.isEmpty(finalShipperCode)) {
+                checkResult.put("success", false);
+                checkResult.put("reason", "未收录该快递公司信息");
+                continue;
+            }
+            checkResult = servicesMap.get(platform).checkExpress(finalShipperCode, logisticCode);
+            if (checkResult.getBoolean("success") != null && checkResult.getBoolean("success")) {
                 break;
             } else {
-                logger.info("--->>> " + platform + " deal the check but got a false. Continue try other platform...");
-                result = null;
+                logger.info("--->>> " + platform + "  got a false with " + checkResult.getString("reason") + ". Try other platform...");
+                checkResult = null;
                 continue;
             }
         }
         redisService.set(redisKey, checkNum + 1 + "", 60 * 60 * 24L);
-        if (result == null) {
+        if (checkResult == null) {
+            logger.info("--->>> No data.");
             return ResultUtil.error(ResultEnum.NO_DATA);
         }
-        return ResultUtil.success(result);
+        return ResultUtil.success(checkResult);
     }
 }
