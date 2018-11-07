@@ -5,15 +5,16 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class ConvertExpress {
 
-    public String convert(String express, String platform) {
-        ClassPathResource resource = new ClassPathResource("expressinfo.json");
+    String convert(String express, String platform) {
+        ClassPathResource resource = new ClassPathResource("expressions.json");
         try {
             File filePath = resource.getFile();
-            InputStreamReader read = new InputStreamReader(new FileInputStream(filePath), "UTF-8");
+            InputStreamReader read = new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8.name());
             BufferedReader br = new BufferedReader(read);
             String s;
             StringBuilder tipster = new StringBuilder();
