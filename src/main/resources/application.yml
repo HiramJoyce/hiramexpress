@@ -3,7 +3,7 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://39.108.48.29:3306/deri?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     data-username: root
     data-password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
@@ -13,3 +13,6 @@ spring:
     port: 6379
     password: hiram
     timeout: 200
+logging:
+  pattern:
+    console: "%boldGreen(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level) %cyan(%-35logger{35}) - %msg %n"
