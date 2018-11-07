@@ -11,7 +11,7 @@ public enum  ResultEnum {
     NOT_LOGIN(-1, "未登录"),
     LOGIN_EXPIRY(-1, "登录失效，请重新登陆"),
     PERMISSION_DENIED(-1, "没有权限"),
-    NO_DATA(-1, "没有权限"),
+    NO_DATA(-1, "没有数据"),
     ;
 
     private Integer code;

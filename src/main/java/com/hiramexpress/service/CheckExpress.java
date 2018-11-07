@@ -51,9 +51,11 @@ public class CheckExpress {
             String platform = keysIterator.next();
             finalShipperCode = convertExpress.convert(shipperCode, platform);
             result = servicesMap.get(platform).checkExpress(finalShipperCode, logisticCode);
-            if (result.getBoolean("success")) {
+            if (result.getBoolean("success") != null && result.getBoolean("success")) {
                 break;
             } else {
+                logger.info("--->>> " + platform + " deal the check but got a false. Continue try other platform...");
+                result = null;
                 continue;
             }
         }
