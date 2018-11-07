@@ -1,6 +1,10 @@
 package com.hiramexpress.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.fasterxml.jackson.core.JsonParser;
+import com.hiramexpress.domain.enums.PlatformEnum;
 import com.hiramexpress.service.IExpressService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +31,37 @@ public class KDNIAOService implements IExpressService {
      */
     public JSONObject checkExpress(String shipperCode, String logisticCode) throws Exception {
         logger.info("--->>> call 快递鸟 checkExpress(" + shipperCode + ", " + logisticCode + ")");
-        return JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
+        JSONObject result = new JSONObject();
+        JSONObject checkResult = JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
+        boolean checkSussess = checkResult.getBoolean("Success");
+        if (!checkSussess) {    // 查询失败
+//            if (checkResult.getString("Reason") != null && checkResult.getString("Reason").contains("没有可用套餐")) {
+//                // TODO 当日查询次数到达3000
+//            } else {
+//                // TODO 没有物流轨迹的
+//            }
+            result.put("success", false);
+            return result;
+        } else {    // 查询成功
+            JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
+            JSONArray newCheckTraces = new JSONArray(); // 获得物流信息
+            JSONObject eachStation;
+            JSONObject newEachStation;
+            for (Object checkTrace : checkTraces) {
+                eachStation = (JSONObject) checkTrace;
+                newEachStation = new JSONObject();
+                newEachStation.put("AcceptStation", eachStation.getString("AcceptStation"));
+                newEachStation.put("AcceptTime", eachStation.getString("AcceptTime"));
+                newEachStation.put("Remark", eachStation.get("Remark"));
+                newCheckTraces.add(newEachStation);
+            }
+            result.put("success", true);
+            result.put("platform", PlatformEnum.KDNIAO);
+            String[] states = {"", "", "在途中", "签收", "问题件"};
+            result.put("state", states[checkResult.getIntValue("State")]);
+            result.put("logisticCode", checkResult.getString("LogisticCode"));
+            result.put("traces", newCheckTraces);
+            return result;
+        }
     }
 }

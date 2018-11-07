@@ -3,6 +3,8 @@ package com.hiramexpress.service;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.hiramexpress.domain.Result;
+import com.hiramexpress.domain.enums.PlatformEnum;
+import com.hiramexpress.domain.enums.ResultEnum;
 import com.hiramexpress.service.impl.KDNIAOService;
 import com.hiramexpress.service.impl.KDPTService;
 import com.hiramexpress.utils.ResultUtil;
@@ -11,10 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class CheckExpress {
@@ -36,24 +36,26 @@ public class CheckExpress {
 
     public Result checkExpress(String shipperCode, String logisticCode) throws Exception {
         logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode);
-        JSONObject result = null;
-        String checkNum = StringUtils.isEmpty(redisService.get("checkNum")) ? "0" : redisService.get("checkNum");
-        int checkNumInt = (Integer.parseInt(checkNum));
-        Map<String, IExpressService> platforms = new LinkedHashMap<>();
-        List<String> platformsList = new ArrayList<>();
-        platformsList.add("KDNIAO");
-        platformsList.add("KDPT");
-        platforms.put("KDNIAO", kdniaoService);
-        platforms.put("KDPT", kdptService);
-        String platform = convertExpress.convert(shipperCode, platformsList.get(checkNumInt % platforms.size()));
-        logger.info("--->>> platform: " + platform);
-        for (String exp : platformsList) {
-            if (exp.equals(platformsList.get(checkNumInt % platforms.size()))) {
-                result = platforms.get(exp).checkExpress(platform, logisticCode);
-                break;
+        JSONObject result;
+        String checkDate = new SimpleDateFormat("yyyyMMdd").format(new Date()); // eg: 20181107
+        String redisKey = "checkNum_" + checkDate;
+        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get("redisKey")) ? "0" : redisService.get("redisKey"));
+        logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
+        String finalShipperCode = convertExpress.convert(shipperCode, PlatformEnum.KDNIAO.name());
+        result = kdniaoService.checkExpress(finalShipperCode, logisticCode);
+        if (result.getBoolean("success")) {
+            return ResultUtil.success(result);
+        } else {
+            finalShipperCode = convertExpress.convert(shipperCode, PlatformEnum.KDPT.name());
+            result = kdptService.checkExpress(finalShipperCode, logisticCode);
+            if (!result.getBoolean("success")) {
+                result = null;
             }
         }
-        redisService.set("checkNum", checkNumInt + 1 + "", 60 * 10L);
+        redisService.set(redisKey, checkNum + 1 + "", 60 * 60 * 24L);
+        if (result == null) {
+            return ResultUtil.error(ResultEnum.NO_DATA);
+        }
         return ResultUtil.success(result);
     }
 }
