@@ -36,20 +36,25 @@ public class CheckExpress {
 
     public Result checkExpress(String shipperCode, String logisticCode) throws Exception {
         logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode);
-        JSONObject result;
-        String checkDate = new SimpleDateFormat("yyyyMMdd").format(new Date()); // eg: 20181107
-        String redisKey = "checkNum_" + checkDate;
-        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get("redisKey")) ? "0" : redisService.get("redisKey"));
+        JSONObject result = null;
+        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
+        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
-        String finalShipperCode = convertExpress.convert(shipperCode, PlatformEnum.KDNIAO.name());
-        result = kdniaoService.checkExpress(finalShipperCode, logisticCode);
-        if (result.getBoolean("success")) {
-            return ResultUtil.success(result);
-        } else {
-            finalShipperCode = convertExpress.convert(shipperCode, PlatformEnum.KDPT.name());
-            result = kdptService.checkExpress(finalShipperCode, logisticCode);
-            if (!result.getBoolean("success")) {
-                result = null;
+
+        Map<String, IExpressService> servicesMap = new LinkedHashMap<>();
+        servicesMap.put(PlatformEnum.KDNIAO.name(), kdniaoService);
+        servicesMap.put(PlatformEnum.KDPT.name(), kdptService);
+
+        String finalShipperCode;
+        Iterator<String> keysIterator = servicesMap.keySet().iterator();
+        while (keysIterator.hasNext()) {
+            String platform = keysIterator.next();
+            finalShipperCode = convertExpress.convert(shipperCode, platform);
+            result = servicesMap.get(platform).checkExpress(finalShipperCode, logisticCode);
+            if (result.getBoolean("success")) {
+                break;
+            } else {
+                continue;
             }
         }
         redisService.set(redisKey, checkNum + 1 + "", 60 * 60 * 24L);
