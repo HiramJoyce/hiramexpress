@@ -66,14 +66,21 @@ public class CheckExpress {
                 continue;
             }
         }
-        redisService.set(redisKey, checkNum + 1 + "", 60 * 60 * 24L);
+        String newCount = checkNum + 1 + "";
+        redisService.set(redisKey, newCount, 60 * 60 * 24L);
         if (checkResult == null) {
             logger.info("--->>> No data.");
-            return ResultUtil.error(ResultEnum.NO_DATA);
+            return ResultUtil.error(ResultEnum.NO_DATA, newCount);
         }
         if (!checkResult.getBoolean("success")) {
-            return ResultUtil.error(ResultEnum.valueOf(checkResult.getString("reason")));
+            return ResultUtil.error(ResultEnum.valueOf(checkResult.getString("reason")), newCount);
         }
-        return ResultUtil.success(checkResult);
+        return ResultUtil.success(newCount, checkResult);
+    }
+
+    public Result<?> getTodayCount() {
+        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
+        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
+        return ResultUtil.success(checkNum);
     }
 }
