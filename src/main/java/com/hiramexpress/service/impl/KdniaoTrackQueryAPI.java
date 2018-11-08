@@ -136,7 +136,7 @@ public class KdniaoTrackQueryAPI {
      * @return 远程资源的响应结果
      */
     @SuppressWarnings("unused")
-    private String sendPost(String url, Map<String, String> params) {
+    public String sendPost(String url, Map<String, String> params) {
         OutputStreamWriter out = null;
         BufferedReader in = null;
         StringBuilder result = new StringBuilder();

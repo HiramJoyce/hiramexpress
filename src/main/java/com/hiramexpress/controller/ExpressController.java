@@ -6,10 +6,7 @@ import com.hiramexpress.domain.enums.ResultEnum;
 import com.hiramexpress.service.CheckExpress;
 import com.hiramexpress.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -33,5 +30,10 @@ public class ExpressController {
     @GetMapping("/count")
     public Result<?> getTodayCount() {
         return checkExpress.getTodayCount();
+    }
+
+    @GetMapping("/analysis")
+    public Result<?> analysisExpress(@RequestParam("logisticCode") String logisticCode) {
+        return checkExpress.analysisExpress(logisticCode);
     }
 }

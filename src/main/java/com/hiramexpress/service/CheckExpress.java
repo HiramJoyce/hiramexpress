@@ -1,12 +1,14 @@
 package com.hiramexpress.service;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hiramexpress.domain.Result;
 import com.hiramexpress.domain.enums.PlatformEnum;
 import com.hiramexpress.domain.enums.ResultEnum;
 import com.hiramexpress.service.impl.KDNIAOService;
 import com.hiramexpress.service.impl.KDPTService;
+import com.hiramexpress.service.impl.KdniaoTrackQueryAPI;
 import com.hiramexpress.utils.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +27,15 @@ public class CheckExpress {
     private final KDNIAOService kdniaoService;  // 快递鸟
     private final KDPTService kdptService;      //
     private final ConvertExpress convertExpress;      // 伙伴数据资源
+    private final KdniaoTrackQueryAPI api;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
         this.convertExpress = convertExpress;
+        this.api = api;
     }
 
     public Result checkExpress(String shipperCode, String logisticCode) throws Exception {
@@ -82,5 +86,15 @@ public class CheckExpress {
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         return ResultUtil.success(checkNum);
+    }
+
+    public Result<?> analysisExpress(String logisticCode) {
+        logger.info("--->>> analysisExpress() with logisticCode: " + logisticCode);
+        String url = "https://www.trackingmore.com/index_ajax.php";
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("tracknumber", logisticCode);
+        params.put("lang", "cn");
+        JSONArray resultArr = JSONObject.parseArray(api.sendPost(url, params));
+        return ResultUtil.success(resultArr);
     }
 }
