@@ -34,7 +34,6 @@ public class KDNIAOService implements IExpressService {
         JSONObject checkResult = JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
         boolean checkSussess = checkResult.getBoolean("Success");
         JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
-        Collections.reverse(checkTraces);   // KDNIAO默认顺序反转
         if (!checkSussess || checkTraces.size() <= 0) {    // 查询失败 或 没有信息
             logger.info("--->>> check failure for " + checkResult.getString("Reason"));
 //            if (checkResult.getString("Reason") != null && checkResult.getString("Reason").contains("没有可用套餐")) {
@@ -47,6 +46,7 @@ public class KDNIAOService implements IExpressService {
             return result;
         } else {    // 查询成功
             logger.info("--->>> check success.");
+            Collections.reverse(checkTraces);   // KDNIAO默认顺序反转
             JSONArray newCheckTraces = new JSONArray(); // 获得物流信息
             JSONObject eachStation;
             JSONObject newEachStation;

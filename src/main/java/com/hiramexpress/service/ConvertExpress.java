@@ -13,8 +13,9 @@ public class ConvertExpress {
     String convert(String express, String platform) {
         ClassPathResource resource = new ClassPathResource("expressions.json");
         try {
-            File filePath = resource.getFile();
-            InputStreamReader read = new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8.name());
+//            File filePath = resource.getFile();
+            InputStream io = this.getClass().getResourceAsStream("/expressions.json");
+            InputStreamReader read = new InputStreamReader(io, StandardCharsets.UTF_8.name());
             BufferedReader br = new BufferedReader(read);
             String s;
             StringBuilder tipster = new StringBuilder();
