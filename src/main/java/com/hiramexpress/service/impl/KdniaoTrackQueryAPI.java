@@ -35,7 +35,7 @@ public class KdniaoTrackQueryAPI {
     public static void main(String[] args) {
         KdniaoTrackQueryAPI api = new KdniaoTrackQueryAPI();
         try {
-            String result = api.getOrderTracesByJson("YD", "3833333114763");
+            String result = api.getOrderTracesByJson("YD", "3956071707782");
             System.out.print(result);
 
         } catch (Exception e) {
@@ -56,7 +56,6 @@ public class KdniaoTrackQueryAPI {
      */
     public String getOrderTracesByJson(String expCode, String expNo) throws Exception{
         String requestData= "{'OrderCode':'','ShipperCode':'" + expCode + "','LogisticCode':'" + expNo + "'}";
-
         Map<String, String> params = new HashMap<String, String>();
         params.put("RequestData", urlEncoder(requestData, "UTF-8"));
         params.put("EBusinessID", EBusinessID);

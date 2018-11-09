@@ -31,7 +31,9 @@ public class KDNIAOService implements IExpressService {
     public JSONObject checkExpress(String shipperCode, String logisticCode) throws Exception {
         logger.info("--->>> call 快递鸟 checkExpress(" + shipperCode + ", " + logisticCode + ")");
         JSONObject result = new JSONObject();
-        JSONObject checkResult = JSONObject.parseObject(api.getOrderTracesByJson(shipperCode, logisticCode));
+        String resultStr = api.getOrderTracesByJson(shipperCode, logisticCode);
+        logger.info("--->>> kdniao resultStr: " + resultStr);
+        JSONObject checkResult = JSONObject.parseObject(resultStr);
         boolean checkSussess = checkResult.getBoolean("Success");
         JSONArray checkTraces = checkResult.getJSONArray("Traces"); // 获得物流信息
         if (!checkSussess || checkTraces.size() <= 0) {    // 查询失败 或 没有信息

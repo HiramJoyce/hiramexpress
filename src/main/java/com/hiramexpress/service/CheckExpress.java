@@ -28,18 +28,25 @@ public class CheckExpress {
     private final KDPTService kdptService;      //
     private final ConvertExpress convertExpress;      // 伙伴数据资源
     private final KdniaoTrackQueryAPI api;
+    private final AnalysisExpress analysisExpress;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
         this.convertExpress = convertExpress;
         this.api = api;
+        this.analysisExpress = analysisExpress;
     }
 
-    public Result checkExpress(String shipperCode, String logisticCode) throws Exception {
-        logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode);
+    public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis) throws Exception {
+        logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode + " & useAnalysis: " + useAnalysis);
+        String newShipperCode = shipperCode;
+        if (useAnalysis) {
+            newShipperCode = analysisExpress.analysis(shipperCode.toUpperCase());
+            logger.info("--->>> analysis: " + shipperCode + " to " + newShipperCode);
+        }
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
@@ -53,7 +60,7 @@ public class CheckExpress {
         JSONObject checkResult = new JSONObject();
         while (keysIterator.hasNext()) {
             String platform = keysIterator.next();
-            finalShipperCode = convertExpress.convert(shipperCode.toUpperCase(), platform);
+            finalShipperCode = convertExpress.convert(newShipperCode, platform);
             if (StringUtils.isEmpty(finalShipperCode)) {
                 checkResult.put("success", false);
                 checkResult.put("reason", ResultEnum.NO_EXPRESS);

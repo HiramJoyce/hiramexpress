@@ -20,11 +20,11 @@ public class ExpressController {
     }
 
     @PostMapping("/check")
-    public Result<?> checkExpressWithCode(String shipperCode, String logisticCode) throws Exception {
+    public Result<?> checkExpressWithCode(String shipperCode, String logisticCode, boolean useAnalysis) throws Exception {
         if (StringUtils.isEmpty(shipperCode) || StringUtils.isEmpty(logisticCode)) {
             return ResultUtil.error(ResultEnum.ERROR);
         }
-        return checkExpress.checkExpress(shipperCode, logisticCode);
+        return checkExpress.checkExpress(shipperCode, logisticCode, useAnalysis);
     }
 
     @GetMapping("/count")
