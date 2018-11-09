@@ -53,7 +53,7 @@ public class CheckExpress {
         JSONObject checkResult = new JSONObject();
         while (keysIterator.hasNext()) {
             String platform = keysIterator.next();
-            finalShipperCode = convertExpress.convert(shipperCode, platform);
+            finalShipperCode = convertExpress.convert(shipperCode.toUpperCase(), platform);
             if (StringUtils.isEmpty(finalShipperCode)) {
                 checkResult.put("success", false);
                 checkResult.put("reason", ResultEnum.NO_EXPRESS);
@@ -95,6 +95,7 @@ public class CheckExpress {
         params.put("tracknumber", logisticCode);
         params.put("lang", "cn");
         JSONArray resultArr = JSONObject.parseArray(api.sendPost(url, params));
+        logger.info(resultArr.toJSONString());
         return ResultUtil.success(resultArr);
     }
 }
