@@ -13,6 +13,8 @@ public enum  ResultEnum {
     PERMISSION_DENIED(-1, "没有权限"),
     NO_DATA(-1, "暂无数据"),
     NO_EXPRESS(-1, "暂未收录该快递公司信息"),
+    OPERATION_NOT_PERMITTED(-1, "操作受限"),
+    OPERATION_TOO_FREQUENTLY(-1, "操作频繁，请五秒后尝试")
     ;
 
     private Integer code;

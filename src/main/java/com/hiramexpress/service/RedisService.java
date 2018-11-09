@@ -20,7 +20,17 @@ public class RedisService {
         stringRedisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
     }
 
+    public static void staticSet(String key, String value, Long time) {
+        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
+        stringRedisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+    }
+
     public String get(String key) {
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+
+    public static String staticGet(String key) {
+        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
         return stringRedisTemplate.opsForValue().get(key);
     }
 
