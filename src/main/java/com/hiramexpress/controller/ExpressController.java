@@ -32,6 +32,11 @@ public class ExpressController {
         return checkExpress.getTodayCount();
     }
 
+    @GetMapping("/list")
+    public Result<?> getExpressList() {
+        return checkExpress.getExpressList();
+    }
+
     @GetMapping("/analysis")
     public Result<?> analysisExpress(@RequestParam("logisticCode") String logisticCode) {
         return checkExpress.analysisExpress(logisticCode);

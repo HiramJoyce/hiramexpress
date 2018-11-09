@@ -95,6 +95,14 @@ public class CheckExpress {
         return ResultUtil.success(checkNum);
     }
 
+    public Result<?> getExpressList() {
+        JSONObject obj = convertExpress.listExpress();
+        if (obj != null) {
+            return ResultUtil.success(obj.keySet());
+        }
+        return ResultUtil.error(ResultEnum.NO_DATA);
+    }
+
     public Result<?> analysisExpress(String logisticCode) {
         logger.info("--->>> analysisExpress() with logisticCode: " + logisticCode);
         String url = "https://www.trackingmore.com/index_ajax.php";
