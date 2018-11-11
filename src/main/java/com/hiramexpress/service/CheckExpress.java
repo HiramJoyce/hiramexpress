@@ -29,15 +29,17 @@ public class CheckExpress {
     private final ConvertExpress convertExpress;      // 伙伴数据资源
     private final KdniaoTrackQueryAPI api;
     private final AnalysisExpress analysisExpress;
+    private final RecordService recordService;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
         this.convertExpress = convertExpress;
         this.api = api;
         this.analysisExpress = analysisExpress;
+        this.recordService = recordService;
     }
 
     public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis) throws Exception {
@@ -93,6 +95,15 @@ public class CheckExpress {
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         return ResultUtil.success(checkNum);
+    }
+
+    public Result<?> getCount() {
+        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
+        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
+        JSONObject count = new JSONObject();
+        count.put("todayCount", checkNum);
+        count.put("historyCount", recordService.allTimes());
+        return ResultUtil.success(count);
     }
 
     public Result<?> getExpressList() {

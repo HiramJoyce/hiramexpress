@@ -20,11 +20,14 @@ public class RecordService {
 
     public Record getRecordByDate(Date date) {
         String dateStr = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        Record record = recordDao.selectRecordByDate(dateStr);
-        return record;
+        return recordDao.selectRecordByDate(dateStr);
     }
 
     public int addRecord(Record record) {
         return recordDao.insertRecords(record);
+    }
+
+    int allTimes() {
+        return recordDao.selectAllTimes();
     }
 }

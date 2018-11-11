@@ -28,8 +28,8 @@ public class ExpressController {
     }
 
     @GetMapping("/count")
-    public Result<?> getTodayCount() {
-        return checkExpress.getTodayCount();
+    public Result<?> getCount() {
+        return checkExpress.getCount();
     }
 
     @GetMapping("/list")
