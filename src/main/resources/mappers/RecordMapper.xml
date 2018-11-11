@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiramexpress.dao.RecordDao" >
+    <resultMap id="BaseResultMap" type="com.hiramexpress.domain.Record" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="record_date" property="recordDate" jdbcType="DATE" />
+        <result column="record_times" property="recordTimes" jdbcType="INTEGER" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, record_date, record_times
+    </sql>
+    <select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.util.Date" >
+        select <include refid="Base_Column_List" /> from record where record_date = #{date,jdbcType=DATE}
+    </select>
+    <insert id="insertRecords" parameterType="com.hiramexpress.domain.Record" >
+        insert into record (record_date, record_times)
+        values (#{recordDate,jdbcType=DATE}, #{recordTimes,jdbcType=INTEGER})
+    </insert>
+</mapper>
