@@ -19,4 +19,7 @@
         insert into record (record_date, record_times)
         values (#{recordDate,jdbcType=DATE}, #{recordTimes,jdbcType=INTEGER})
     </insert>
+    <update id="updateRecord" parameterType="com.hiramexpress.domain.Record">
+        update record set record_times=#{recordTimes,jdbcType=INTEGER} where id=#{id,jdbcType=INTEGER}
+    </update>
 </mapper>

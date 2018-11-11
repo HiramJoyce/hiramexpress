@@ -8,4 +8,5 @@ public interface RecordDao {
     Record selectRecordByDate(String data);
     int insertRecords(Record record);
     int selectAllTimes();
+    int updateRecord(Record record);
 }

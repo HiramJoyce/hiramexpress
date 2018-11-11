@@ -91,12 +91,6 @@ public class CheckExpress {
         return ResultUtil.success(newCount, checkResult);
     }
 
-    public Result<?> getTodayCount() {
-        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
-        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
-        return ResultUtil.success(checkNum);
-    }
-
     public Result<?> getCount() {
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
