@@ -9,7 +9,7 @@
     <sql id="Base_Column_List" >
         id, record_date, record_times
     </sql>
-    <select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.util.Date" >
+    <select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
         select <include refid="Base_Column_List" /> from record where record_date = #{date,jdbcType=DATE}
     </select>
     <insert id="insertRecords" parameterType="com.hiramexpress.domain.Record" >
