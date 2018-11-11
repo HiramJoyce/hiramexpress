@@ -41,4 +41,9 @@ public class ExpressController {
     public Result<?> analysisExpress(@RequestParam("logisticCode") String logisticCode) {
         return checkExpress.analysisExpress(logisticCode);
     }
+
+    @PostMapping("/rate")
+    public Result<?> rate(String message, String email, int stars) {
+        return checkExpress.rate(message, email, stars);
+    }
 }

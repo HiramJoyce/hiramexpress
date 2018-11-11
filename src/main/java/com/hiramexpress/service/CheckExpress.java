@@ -30,9 +30,10 @@ public class CheckExpress {
     private final KdniaoTrackQueryAPI api;
     private final AnalysisExpress analysisExpress;
     private final RecordService recordService;
+    private final RateService rateService;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService, RateService rateService) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
@@ -40,6 +41,7 @@ public class CheckExpress {
         this.api = api;
         this.analysisExpress = analysisExpress;
         this.recordService = recordService;
+        this.rateService = rateService;
     }
 
     public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis) throws Exception {
@@ -108,7 +110,7 @@ public class CheckExpress {
         return ResultUtil.error(ResultEnum.NO_DATA);
     }
 
-    public Result<?> analysisExpress(String logisticCode) {
+    public Result<?> analysisExpress(String logisticCode) {     // 分析号码功能
         logger.info("--->>> analysisExpress() with logisticCode: " + logisticCode);
         String url = "https://www.trackingmore.com/index_ajax.php";
         Map<String, String> params = new LinkedHashMap<>();
@@ -117,5 +119,12 @@ public class CheckExpress {
         JSONArray resultArr = JSONObject.parseArray(api.sendPost(url, params));
         logger.info(resultArr.toJSONString());
         return ResultUtil.success(resultArr);
+    }
+
+    public Result<?> rate(String message, String email, int stars) {
+        if (rateService.saveRate(message, email, stars) > 0) {
+            return ResultUtil.success();
+        }
+        return ResultUtil.error(ResultEnum.ERROR);
     }
 }
