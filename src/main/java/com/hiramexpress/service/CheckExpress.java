@@ -6,9 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.hiramexpress.domain.Result;
 import com.hiramexpress.domain.enums.PlatformEnum;
 import com.hiramexpress.domain.enums.ResultEnum;
-import com.hiramexpress.service.impl.KDNIAOService;
-import com.hiramexpress.service.impl.KDPTService;
-import com.hiramexpress.service.impl.KdniaoTrackQueryAPI;
+import com.hiramexpress.service.checkimpl.KDNIAOService;
+import com.hiramexpress.service.checkimpl.KDPTService;
+import com.hiramexpress.service.checkimpl.KdniaoTrackQueryAPI;
+import com.hiramexpress.utils.AnalysisUtil;
 import com.hiramexpress.utils.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +32,10 @@ public class CheckExpress {
     private final AnalysisExpress analysisExpress;
     private final RecordService recordService;
     private final RateService rateService;
+    private final AnalysisUtil analysisUtil;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService, RateService rateService) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService, RateService rateService, AnalysisUtil analysisUtil) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
@@ -42,13 +44,14 @@ public class CheckExpress {
         this.analysisExpress = analysisExpress;
         this.recordService = recordService;
         this.rateService = rateService;
+        this.analysisUtil = analysisUtil;
     }
 
-    public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis) throws Exception {
+    public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis, String analysisPlatform) throws Exception {
         logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode + " & useAnalysis: " + useAnalysis);
         String newShipperCode = shipperCode;
         if (useAnalysis) {
-            newShipperCode = analysisExpress.analysis(shipperCode.toUpperCase());
+            newShipperCode = analysisUtil.analysis(shipperCode.toUpperCase(), analysisPlatform);
             logger.info("--->>> analysis: " + shipperCode + " to " + newShipperCode);
         }
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
@@ -108,17 +111,6 @@ public class CheckExpress {
             return ResultUtil.success(obj.keySet());
         }
         return ResultUtil.error(ResultEnum.NO_DATA);
-    }
-
-    public Result<?> analysisExpress(String logisticCode) {     // 分析号码功能
-        logger.info("--->>> analysisExpress() with logisticCode: " + logisticCode);
-        String url = "https://www.trackingmore.com/index_ajax.php";
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("tracknumber", logisticCode);
-        params.put("lang", "cn");
-        JSONArray resultArr = JSONObject.parseArray(api.sendPost(url, params));
-        logger.info(resultArr.toJSONString());
-        return ResultUtil.success(resultArr);
     }
 
     public Result<?> rate(String message, String email, int stars) {
