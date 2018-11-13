@@ -15,6 +15,9 @@
     <select id="selectAllTimes" resultType="java.lang.Integer" >
         select sum(record_times) from record
     </select>
+    <select id="selectRecords" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from record
+    </select>
     <insert id="insertRecords" parameterType="com.hiramexpress.domain.Record" >
         insert into record (record_date, record_times)
         values (#{recordDate,jdbcType=DATE}, #{recordTimes,jdbcType=INTEGER})

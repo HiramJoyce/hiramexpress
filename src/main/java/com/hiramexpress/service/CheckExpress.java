@@ -152,4 +152,13 @@ public class CheckExpress {
         }
         return ResultUtil.error(ResultEnum.ERROR);
     }
+
+    public Result<?> statistics() {
+        JSONObject record = recordService.findRecords();
+        JSONArray checkRecords = checkRecordService.findCheckRecords();
+        JSONObject result = new JSONObject();
+        result.put("record", record);
+        result.put("checkRecord", checkRecords);
+        return ResultUtil.success(result);
+    }
 }

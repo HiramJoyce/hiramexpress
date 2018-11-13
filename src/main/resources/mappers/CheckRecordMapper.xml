@@ -17,9 +17,9 @@
     <sql id="Base_Insert_Column_List" >
         check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason, check_platform
     </sql>
-    <!--<select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.lang.String" >-->
-        <!--select <include refid="Base_Column_List" /> from record where record_date = #{date,jdbcType=DATE}-->
-    <!--</select>-->
+    <select id="selectACheckRecords" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from check_record
+    </select>
     <insert id="insertCheckRecords" parameterType="com.hiramexpress.domain.CheckRecord" >
         insert into check_record (<include refid="Base_Insert_Column_List" />) values (
         #{checkShipperCode,jdbcType=VARCHAR},
@@ -31,7 +31,4 @@
         #{checkPlatform,jdbcType=VARCHAR}
         )
     </insert>
-    <!--<update id="updateRecord" parameterType="com.hiramexpress.domain.Record">-->
-        <!--update record set record_times=#{recordTimes,jdbcType=INTEGER} where id=#{id,jdbcType=INTEGER}-->
-    <!--</update>-->
 </mapper>

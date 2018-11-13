@@ -49,4 +49,10 @@ public class ExpressController {
     public Result<?> rate(String message, String email, int stars) {
         return checkExpress.rate(message, email, stars);
     }
+
+    @GetMapping("/statistics")
+    public Result<?> statistics() {
+        return checkExpress.statistics();
+    }
+
 }
