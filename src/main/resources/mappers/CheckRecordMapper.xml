@@ -9,12 +9,13 @@
         <result column="check_result" property="checkResult" jdbcType="INTEGER" />
         <result column="check_realip" property="checkRealIp" jdbcType="VARCHAR" />
         <result column="check_reason" property="checkReason" jdbcType="VARCHAR" />
+        <result column="check_platform" property="checkPlatform" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-        id, check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason
+        id, check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason, check_platform
     </sql>
     <sql id="Base_Insert_Column_List" >
-        check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason
+        check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason, check_platform
     </sql>
     <!--<select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.lang.String" >-->
         <!--select <include refid="Base_Column_List" /> from record where record_date = #{date,jdbcType=DATE}-->
@@ -26,7 +27,8 @@
         #{checkDate,jdbcType=TIMESTAMP},
         #{checkResult,jdbcType=INTEGER},
         #{checkRealIp,jdbcType=VARCHAR},
-        #{checkReason,jdbcType=VARCHAR}
+        #{checkReason,jdbcType=VARCHAR},
+        #{checkPlatform,jdbcType=VARCHAR}
         )
     </insert>
     <!--<update id="updateRecord" parameterType="com.hiramexpress.domain.Record">-->

@@ -9,6 +9,7 @@ public class CheckRecord {
     private int checkResult;
     private String checkReason;
     private String checkRealIp;
+    private String checkPlatform;
     private Date checkDate;
 
     public int getId() {
@@ -57,6 +58,14 @@ public class CheckRecord {
 
     public void setCheckRealIp(String checkRealIp) {
         this.checkRealIp = checkRealIp;
+    }
+
+    public String getCheckPlatform() {
+        return checkPlatform;
+    }
+
+    public void setCheckPlatform(String checkPlatform) {
+        this.checkPlatform = checkPlatform;
     }
 
     public Date getCheckDate() {

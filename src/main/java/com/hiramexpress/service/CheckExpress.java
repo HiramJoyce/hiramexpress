@@ -89,8 +89,6 @@ public class CheckExpress {
         Iterator<String> keysIterator = servicesMap.keySet().iterator();
         JSONObject checkResult = new JSONObject();
 
-
-
         while (keysIterator.hasNext()) {
             String platform = keysIterator.next();
             finalShipperCode = convertExpress.convert(newShipperCode, platform);
@@ -125,6 +123,7 @@ public class CheckExpress {
             checkRecordService.addCheckRecord(checkRecord);
             return ResultUtil.error(ResultEnum.valueOf(checkResult.getString("reason")), newCount);
         }
+        checkRecord.setCheckPlatform(checkResult.getString("platform"));
         checkRecordService.addCheckRecord(checkRecord);
         return ResultUtil.success(newCount, checkResult);
     }
