@@ -3,6 +3,6 @@
 <mapper namespace="com.hiramexpress.dao.RateDao" >
     <insert id="insertRate">
         insert into rate (rate_message, rate_email, rate_stars, rate_realip, rate_time)
-        values (#{message,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{stars,jdbcType=INTEGER}, #{realIp,jdbcType=VARCHAR}, #{date,jdbcType=DATE})
+        values (#{message,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{stars,jdbcType=INTEGER}, #{realIp,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP})
     </insert>
 </mapper>

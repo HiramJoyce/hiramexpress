@@ -3,6 +3,7 @@ package com.hiramexpress.service;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.hiramexpress.domain.CheckRecord;
 import com.hiramexpress.domain.Result;
 import com.hiramexpress.domain.enums.PlatformEnum;
 import com.hiramexpress.domain.enums.ResultEnum;
@@ -10,12 +11,16 @@ import com.hiramexpress.service.checkimpl.KDNIAOService;
 import com.hiramexpress.service.checkimpl.KDPTService;
 import com.hiramexpress.service.checkimpl.KdniaoTrackQueryAPI;
 import com.hiramexpress.utils.AnalysisUtil;
+import com.hiramexpress.utils.ClientIPUtils;
 import com.hiramexpress.utils.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,11 +36,12 @@ public class CheckExpress {
     private final KdniaoTrackQueryAPI api;
     private final AnalysisExpress analysisExpress;
     private final RecordService recordService;
+    private final CheckRecordService checkRecordService;
     private final RateService rateService;
     private final AnalysisUtil analysisUtil;
 
     @Autowired
-    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService, RateService rateService, AnalysisUtil analysisUtil) {
+    public CheckExpress(RedisService redisService, KDNIAOService kdniaoService, KDPTService kdptService, ConvertExpress convertExpress, KdniaoTrackQueryAPI api, AnalysisExpress analysisExpress, RecordService recordService, RateService rateService, AnalysisUtil analysisUtil, CheckRecordService checkRecordService) {
         this.redisService = redisService;
         this.kdniaoService = kdniaoService;
         this.kdptService = kdptService;
@@ -43,17 +49,34 @@ public class CheckExpress {
         this.api = api;
         this.analysisExpress = analysisExpress;
         this.recordService = recordService;
+        this.checkRecordService = checkRecordService;
         this.rateService = rateService;
         this.analysisUtil = analysisUtil;
     }
 
     public Result checkExpress(String shipperCode, String logisticCode, boolean useAnalysis, String analysisPlatform) throws Exception {
         logger.info("--->>> ShipperCode: " + shipperCode + " & LogisticCode: " + logisticCode + " & useAnalysis: " + useAnalysis);
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String realIp = ClientIPUtils.getClientIp(request);
         String newShipperCode = shipperCode;
+        CheckRecord checkRecord = new CheckRecord();
+        checkRecord.setCheckLogisticCode(logisticCode);
+        checkRecord.setCheckDate(new Date());
+        checkRecord.setCheckRealIp(realIp);
+        checkRecord.setCheckReason("");
         if (useAnalysis) {
             newShipperCode = analysisUtil.analysis(shipperCode.toUpperCase(), analysisPlatform);
             logger.info("--->>> analysis: " + shipperCode + " to " + newShipperCode);
+            if (StringUtils.isEmpty(newShipperCode)) {
+                checkRecord.setCheckShipperCode("null");
+                checkRecord.setCheckResult(-1);
+                checkRecord.setCheckReason(ResultEnum.NO_EXPRESS.getMsg());
+                checkRecordService.addCheckRecord(checkRecord);
+                return ResultUtil.error(ResultEnum.NO_EXPRESS);
+            }
         }
+        checkRecord.setCheckShipperCode(newShipperCode);
         String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
         int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
         logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
@@ -65,6 +88,9 @@ public class CheckExpress {
         String finalShipperCode;
         Iterator<String> keysIterator = servicesMap.keySet().iterator();
         JSONObject checkResult = new JSONObject();
+
+
+
         while (keysIterator.hasNext()) {
             String platform = keysIterator.next();
             finalShipperCode = convertExpress.convert(newShipperCode, platform);
@@ -88,11 +114,18 @@ public class CheckExpress {
         redisService.set(redisKey, newCount, 60 * 60 * 24L);
         if (checkResult == null) {
             logger.info("--->>> No data.");
+            checkRecord.setCheckResult(-1);
+            checkRecord.setCheckReason(ResultEnum.NO_DATA.getMsg());
+            checkRecordService.addCheckRecord(checkRecord);
             return ResultUtil.error(ResultEnum.NO_DATA, newCount);
         }
         if (!checkResult.getBoolean("success")) {
+            checkRecord.setCheckResult(-1);
+            checkRecord.setCheckReason(ResultEnum.valueOf(checkResult.getString("reason")).getMsg());
+            checkRecordService.addCheckRecord(checkRecord);
             return ResultUtil.error(ResultEnum.valueOf(checkResult.getString("reason")), newCount);
         }
+        checkRecordService.addCheckRecord(checkRecord);
         return ResultUtil.success(newCount, checkResult);
     }
 

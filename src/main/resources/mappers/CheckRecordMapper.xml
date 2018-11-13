@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiramexpress.dao.CheckRecordDao" >
+    <resultMap id="BaseResultMap" type="com.hiramexpress.domain.CheckRecord" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="check_shippercode" property="checkShipperCode" jdbcType="VARCHAR" />
+        <result column="check_logisticcode" property="checkLogisticCode" jdbcType="VARCHAR" />
+        <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+        <result column="check_result" property="checkResult" jdbcType="INTEGER" />
+        <result column="check_realip" property="checkRealIp" jdbcType="VARCHAR" />
+        <result column="check_reason" property="checkReason" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason
+    </sql>
+    <sql id="Base_Insert_Column_List" >
+        check_shippercode, check_logisticcode, check_date, check_result, check_realip, check_reason
+    </sql>
+    <!--<select id="selectRecordByDate" resultMap="BaseResultMap" parameterType="java.lang.String" >-->
+        <!--select <include refid="Base_Column_List" /> from record where record_date = #{date,jdbcType=DATE}-->
+    <!--</select>-->
+    <insert id="insertCheckRecords" parameterType="com.hiramexpress.domain.CheckRecord" >
+        insert into check_record (<include refid="Base_Insert_Column_List" />) values (
+        #{checkShipperCode,jdbcType=VARCHAR},
+        #{checkLogisticCode,jdbcType=VARCHAR},
+        #{checkDate,jdbcType=TIMESTAMP},
+        #{checkResult,jdbcType=INTEGER},
+        #{checkRealIp,jdbcType=VARCHAR},
+        #{checkReason,jdbcType=VARCHAR}
+        )
+    </insert>
+    <!--<update id="updateRecord" parameterType="com.hiramexpress.domain.Record">-->
+        <!--update record set record_times=#{recordTimes,jdbcType=INTEGER} where id=#{id,jdbcType=INTEGER}-->
+    <!--</update>-->
+</mapper>
