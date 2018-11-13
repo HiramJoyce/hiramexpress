@@ -59,6 +59,13 @@ public class CheckExpress {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         String realIp = ClientIPUtils.getClientIp(request);
+
+        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
+        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
+        logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
+        String newCount = checkNum + 1 + "";
+        redisService.set(redisKey, newCount, 60 * 60 * 24L);
+
         String newShipperCode = shipperCode;
         CheckRecord checkRecord = new CheckRecord();
         checkRecord.setCheckLogisticCode(logisticCode);
@@ -69,17 +76,13 @@ public class CheckExpress {
             newShipperCode = analysisUtil.analysis(shipperCode.toUpperCase(), analysisPlatform);
             logger.info("--->>> analysis: " + shipperCode + " to " + newShipperCode);
             if (StringUtils.isEmpty(newShipperCode)) {
-                checkRecord.setCheckShipperCode("null");
                 checkRecord.setCheckResult(-1);
                 checkRecord.setCheckReason(ResultEnum.NO_EXPRESS.getMsg());
                 checkRecordService.addCheckRecord(checkRecord);
-                return ResultUtil.error(ResultEnum.NO_EXPRESS);
+                return ResultUtil.error(ResultEnum.NO_EXPRESS, newCount);
             }
         }
         checkRecord.setCheckShipperCode(newShipperCode);
-        String redisKey = "checkNum_" + new SimpleDateFormat("yyyyMMdd").format(new Date());    // eg: checkNum_20181107
-        int checkNum = Integer.parseInt(StringUtils.isEmpty(redisService.get(redisKey)) ? "0" : redisService.get(redisKey));
-        logger.info("--->>> redis data: key:" + redisKey + " value:" + checkNum);
 
         Map<String, IExpressService> servicesMap = new LinkedHashMap<>();
         servicesMap.put(PlatformEnum.KDNIAO.name(), kdniaoService);
@@ -108,8 +111,6 @@ public class CheckExpress {
                 continue;
             }
         }
-        String newCount = checkNum + 1 + "";
-        redisService.set(redisKey, newCount, 60 * 60 * 24L);
         if (checkResult == null) {
             logger.info("--->>> No data.");
             checkRecord.setCheckResult(-1);
