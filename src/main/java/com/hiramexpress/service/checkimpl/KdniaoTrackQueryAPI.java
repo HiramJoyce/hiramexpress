@@ -48,7 +48,7 @@ public class KdniaoTrackQueryAPI {
     //电商加密私钥，快递鸟提供，注意保管，不要泄漏
     private String AppKey="a9413f92-9eb6-4a5a-87bc-abc9d9a733bd";
     //请求url
-    private String ReqURL="http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx";
+    private String ReqURL="http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
 
     /**
      * Json方式 查询订单物流轨迹
